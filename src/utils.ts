@@ -14,12 +14,12 @@ export const parseInputFiles = (files: string): string[] => {
   )
 }
 
-const getAsset = (url: string) => {
+const getAsset = (pathUrl: string) => {
   return {
-    name: path.basename(url),
-    mime: mime.getType(url) || 'application/octet-stream',
-    size: fs.statSync(url).size,
-    data: fs.readFileSync(url)
+    name: path.basename(pathUrl),
+    mime: mime.getType(pathUrl) || 'application/octet-stream',
+    size: fs.statSync(pathUrl).size,
+    data: fs.readFileSync(pathUrl)
   }
 }
 export const uploadReleaseAsset = async (

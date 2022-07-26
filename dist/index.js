@@ -49,7 +49,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const uploadUrl = core.getInput('upload_url', { required: true });
-            const file = core.getInput('file', { required: true });
+            const file = core.getInput('files', { required: true });
             const token = core.getInput('token', { required: true });
             const input_files = (0, utils_1.parseInputFiles)(file);
             if (input_files.length) {
@@ -109,12 +109,12 @@ const parseInputFiles = (files) => {
         .map(pat => pat.trim()), []);
 };
 exports.parseInputFiles = parseInputFiles;
-const getAsset = (url) => {
+const getAsset = (pathUrl) => {
     return {
-        name: path_1.default.basename(url),
-        mime: mime_1.default.getType(url) || 'application/octet-stream',
-        size: fs_1.default.statSync(url).size,
-        data: fs_1.default.readFileSync(url)
+        name: path_1.default.basename(pathUrl),
+        mime: mime_1.default.getType(pathUrl) || 'application/octet-stream',
+        size: fs_1.default.statSync(pathUrl).size,
+        data: fs_1.default.readFileSync(pathUrl)
     };
 };
 const uploadReleaseAsset = (path, url, token) => __awaiter(void 0, void 0, void 0, function* () {

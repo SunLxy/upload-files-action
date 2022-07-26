@@ -97,7 +97,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.uploadReleaseAsset = exports.parseInputFiles = void 0;
+exports.uploadReleaseAsset = exports.uploadUrl = exports.parseInputFiles = void 0;
 const path_1 = __importDefault(__nccwpck_require__(5622));
 const mime_1 = __importDefault(__nccwpck_require__(9994));
 const fs_1 = __importDefault(__nccwpck_require__(5747));
@@ -109,6 +109,14 @@ const parseInputFiles = (files) => {
         .map(pat => pat.trim()), []);
 };
 exports.parseInputFiles = parseInputFiles;
+const uploadUrl = (url) => {
+    const templateMarkerPos = url.indexOf('{');
+    if (templateMarkerPos > -1) {
+        return url.substring(0, templateMarkerPos);
+    }
+    return url;
+};
+exports.uploadUrl = uploadUrl;
 const getAsset = (pathUrl) => {
     return {
         name: path_1.default.basename(pathUrl),
@@ -119,7 +127,7 @@ const getAsset = (pathUrl) => {
 };
 const uploadReleaseAsset = (path, url, token) => __awaiter(void 0, void 0, void 0, function* () {
     const asset = getAsset(path);
-    const endpoint = new URL(url);
+    const endpoint = new URL((0, exports.uploadUrl)(url));
     endpoint.searchParams.append('name', asset.name);
     const resp = yield (0, node_fetch_1.default)(endpoint, {
         headers: {

@@ -13,7 +13,13 @@ export const parseInputFiles = (files: string): string[] => {
     []
   )
 }
-
+export const uploadUrl = (url: string): string => {
+  const templateMarkerPos = url.indexOf('{')
+  if (templateMarkerPos > -1) {
+    return url.substring(0, templateMarkerPos)
+  }
+  return url
+}
 const getAsset = (pathUrl: string) => {
   return {
     name: path.basename(pathUrl),
@@ -28,7 +34,7 @@ export const uploadReleaseAsset = async (
   token: string
 ) => {
   const asset = getAsset(path)
-  const endpoint = new URL(url)
+  const endpoint = new URL(uploadUrl(url))
   endpoint.searchParams.append('name', asset.name)
   const resp = await fetch(endpoint, {
     headers: {

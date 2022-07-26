@@ -5,7 +5,7 @@ import {uploadReleaseAsset, parseInputFiles} from './utils'
 async function run(): Promise<void> {
   try {
     const uploadUrl = core.getInput('upload_url', {required: true})
-    const file = core.getInput('file', {required: true})
+    const file = core.getInput('files', {required: true})
     const token = core.getInput('token', {required: true})
 
     const input_files = parseInputFiles(file)

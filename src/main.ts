@@ -1,16 +1,30 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import FG from 'fast-glob'
+import {uploadReleaseAsset, parseInputFiles} from './utils'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const uploadUrl = core.getInput('upload_url', {required: true})
+    const file = core.getInput('file', {required: true})
+    const token = core.getInput('token', {required: true})
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    core.setOutput('time', new Date().toTimeString())
+    const input_files = parseInputFiles(file)
+    if (input_files.length) {
+      const entries = await FG(input_files)
+      const assets = await Promise.all(
+        entries.map(async path => {
+          const json = await uploadReleaseAsset(path, uploadUrl, token)
+          delete json.uploader
+          return json
+        })
+      ).catch(error => {
+        throw error
+      })
+      core.setOutput('assets', assets)
+    } else {
+      core.setFailed('File cannot be empty')
+    }
+    console.log(`🎉 Release ready`)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

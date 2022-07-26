@@ -1,8 +1,8 @@
 {
-  "name": "typescript-action",
-  "version": "0.0.0",
+  "name": "upload-files-action",
+  "version": "1.0.0",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "文件上传",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -25,9 +25,14 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.6.0"
+    "@actions/core": "1.9.0",
+    "fast-glob": "3.2.11",
+    "mime": "^2.4.4",
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
+    "@types/node-fetch": "^2.5.12",
+    "@types/mime": "^2.0.1",
     "@types/node": "^16.10.5",
     "@typescript-eslint/parser": "^5.8.1",
     "@vercel/ncc": "^0.31.1",
@@ -38,6 +43,7 @@
     "js-yaml": "^4.1.0",
     "prettier": "2.5.1",
     "ts-jest": "^27.1.2",
+    "ts-node": "^10.9.1",
     "typescript": "^4.4.4"
   }
 }

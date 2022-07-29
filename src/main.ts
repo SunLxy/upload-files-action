@@ -10,9 +10,9 @@ async function run(): Promise<void> {
 
     const input_files = parseInputFiles(file)
     if (input_files.length) {
-      console.log('files---->', JSON.stringify(input_files, null, 2))
-      core.info(`files---->: ${JSON.stringify(input_files, null, 2)}`)
       const entries = await FG(input_files)
+      console.log(`entries---->${JSON.stringify(entries, null, 2)}`)
+      core.info(`entries---->${JSON.stringify(entries, null, 2)}`)
       const assets = await Promise.all(
         entries.map(async path => {
           const json = await uploadReleaseAsset(path, uploadUrl, token)
@@ -23,8 +23,8 @@ async function run(): Promise<void> {
         throw error
       })
       core.setOutput('assets', assets)
+      console.log(`'assets--->${JSON.stringify(assets, null, 2)}`)
       core.info(`assets: ${JSON.stringify(assets, null, 2)}`)
-      console.log('assets', JSON.stringify(assets, null, 2))
     } else {
       core.setFailed('File cannot be empty')
     }

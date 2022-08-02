@@ -31,7 +31,9 @@ const getAsset = (pathUrl: string) => {
 export const uploadReleaseAsset = async (
   path: string,
   url: string,
-  token: string
+  token: string,
+  newHeader: Record<string, undefined>,
+  method: string
 ) => {
   const asset = getAsset(path)
   const endpoint = new URL(uploadUrl(url))
@@ -40,9 +42,10 @@ export const uploadReleaseAsset = async (
     headers: {
       'content-length': `${asset.size}`,
       'content-type': asset.mime,
-      authorization: `token ${token}`
+      authorization: `token ${token}`,
+      ...(newHeader || {})
     },
-    method: 'POST',
+    method: method || 'POST',
     body: asset.data
   })
   const json = await resp.json()

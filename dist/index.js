@@ -45,19 +45,38 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const fast_glob_1 = __importDefault(__nccwpck_require__(3664));
 const utils_1 = __nccwpck_require__(918);
+const path_1 = __importDefault(__nccwpck_require__(5622));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const uploadUrl = core.getInput('upload_url', { required: true });
-            const file = core.getInput('files', { required: true });
-            const token = core.getInput('token', { required: true });
+            const uploadUrl = core.getInput('upload_url');
+            const file = core.getInput('files');
+            const token = core.getInput('token');
+            const headers = core.getInput('headers');
+            const method = core.getInput('method');
+            const cwd = core.getInput('cwd');
+            if (!uploadUrl) {
+                throw new Error('uploadUrl is empty');
+            }
+            if (!file) {
+                throw new Error('file is empty');
+            }
+            if (!token) {
+                throw new Error('token is empty');
+            }
+            let newHeader = {};
+            // 处理 headers 值
+            if (headers && headers.trim()) {
+                newHeader = JSON.parse(headers);
+            }
             const input_files = (0, utils_1.parseInputFiles)(file);
             if (input_files.length) {
-                const entries = yield (0, fast_glob_1.default)(input_files);
+                const newCwd = cwd || process.cwd();
+                const entries = yield (0, fast_glob_1.default)(input_files, { cwd: newCwd });
                 console.log(`entries---->${JSON.stringify(entries, null, 2)}`);
                 core.info(`entries---->${JSON.stringify(entries, null, 2)}`);
-                const assets = yield Promise.all(entries.map((path) => __awaiter(this, void 0, void 0, function* () {
-                    const json = yield (0, utils_1.uploadReleaseAsset)(path, uploadUrl, token);
+                const assets = yield Promise.all(entries.map((pathUrls) => __awaiter(this, void 0, void 0, function* () {
+                    const json = yield (0, utils_1.uploadReleaseAsset)(path_1.default.join(newCwd, pathUrls), uploadUrl, token, newHeader, method);
                     delete json.uploader;
                     return json;
                 }))).catch(error => {
@@ -129,17 +148,13 @@ const getAsset = (pathUrl) => {
         data: fs_1.default.readFileSync(pathUrl)
     };
 };
-const uploadReleaseAsset = (path, url, token) => __awaiter(void 0, void 0, void 0, function* () {
+const uploadReleaseAsset = (path, url, token, newHeader, method) => __awaiter(void 0, void 0, void 0, function* () {
     const asset = getAsset(path);
     const endpoint = new URL((0, exports.uploadUrl)(url));
     endpoint.searchParams.append('name', asset.name);
     const resp = yield (0, node_fetch_1.default)(endpoint, {
-        headers: {
-            'content-length': `${asset.size}`,
-            'content-type': asset.mime,
-            authorization: `token ${token}`
-        },
-        method: 'POST',
+        headers: Object.assign({ 'content-length': `${asset.size}`, 'content-type': asset.mime, authorization: `token ${token}` }, (newHeader || {})),
+        method: method || 'POST',
         body: asset.data
     });
     const json = yield resp.json();
